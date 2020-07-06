@@ -1,7 +1,7 @@
-#coding:utf-8
+# coding:utf-8
 import pandas as pd
 import numpy as np
-pd.options.display.max_columns = None # pandas显示全部列
+#pd.options.display.max_columns = None  # pandas显示全部列
 from tqdm import tqdm
 import os
 import sys
@@ -10,20 +10,17 @@ import time
 
 def get_state_cgbs():
     state_cbgs = []
-    df_cbg = pd.read_csv("/Users/liangyi/github/covid-19/excel/fips/FipsStateCodes.csv")
+    df_cbg = pd.read_csv("G:/dataset/fips/FipsStateCodes.csv")
     for idx, value in df_cbg.iterrows():
         tmp = str(value.FIPS)[:-3]
         # print(tmp)
         state_cbgs.append(int(tmp))
     state_cbgs = sorted(state_cbgs)  # 改为升序数组
-    return  state_cbgs
+    return state_cbgs
 
 
-# def read_csv(csv_path):
-#     df = pd.read_csv(csv_path)
-#
-def get_pop_flow(state_cbgs, df_origin):
-    pop_flow = pd.DataFrame(0, index = state_cbgs, columns = state_cbgs)
+def get_pop_flow(df_origin, state_cbgs):
+    pop_flow = pd.DataFrame(0, index=state_cbgs, columns=state_cbgs)
     begin_time = time.time()
     end_time = time.time()
     for idx, value in df_origin.iterrows():
@@ -42,23 +39,24 @@ def get_pop_flow(state_cbgs, df_origin):
             cbg_come = int(str(key)[:2])
             if cbg_come in state_cbgs:
                 pop_flow.loc[cbg_go][cbg_come] += int(visit_home[key])
-    return  pop_flow
+    return pop_flow
 
-def write_pop_flow(csv_read_path,csv_write_path,pop_flow):
+
+def write_pop_flow(csv_read_path, csv_write_path):
     df_origin = pd.read_csv(csv_read_path)
     state_cbgs = get_state_cgbs()
-    pop_flow = get_pop_flow(df_origin,state_cbgs)
+    pop_flow = get_pop_flow(df_origin, state_cbgs)
     pop_flow.to_csv(csv_write_path)
+    print(csv_write_path)
 
 
 if __name__ == "__main__":
-    file_path = "/Users/liangyi/github/covid-19/dataset/social-distancing/"
-    save_path = ""
-    for file in os.listdir(file_path):
-        csv_read_path = file_path + file
-        csv_write_path = save_path +
-    if ".csv" in file:
-        csv_read_path = file_path + file
-        tmp = '-'.join(file.split('-')[:3])
-        csv_write_path = save_path + tmp + '-state-popflow-.csv'
-
+    file_path = "G:/dataset/social-distance/02/"
+    save_path = "G:/dataset/popflow-state/"
+    for file in tqdm(os.listdir(file_path)):
+        print(file)
+        if ".csv" in file:
+            csv_read_path = file_path + file
+            tmp = '-'.join(file.split('-')[:3])
+            csv_write_path = save_path + tmp + '-state-popflow-.csv'
+            write_pop_flow(csv_read_path,csv_write_path)
