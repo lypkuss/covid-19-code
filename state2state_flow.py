@@ -2,7 +2,7 @@
 import pandas as pd
 import numpy as np
 #pd.options.display.max_columns = None  # pandas显示全部列
-from tqdm import tqdm
+#from tqdm import tqdm
 import os
 import sys
 import time
@@ -10,7 +10,7 @@ import time
 
 def get_state_cgbs():
     state_cbgs = []
-    df_cbg = pd.read_csv("G:/dataset/fips/FipsStateCodes.csv")
+    df_cbg = pd.read_csv("/root/data/liangyi/dataset/fips/FipsStateCodes.csv")
     for idx, value in df_cbg.iterrows():
         tmp = str(value.FIPS)[:-3]
         # print(tmp)
@@ -21,18 +21,13 @@ def get_state_cgbs():
 
 def get_pop_flow(df_origin, state_cbgs):
     pop_flow = pd.DataFrame(0, index=state_cbgs, columns=state_cbgs)
-    begin_time = time.time()
-    end_time = time.time()
+    #begin_time = time.time()
+    #end_time = time.time()
     for idx, value in df_origin.iterrows():
         visit_home = eval(value.destination_cbgs)
         # print(visit_home.keys())
 
         cbg_go = int(str(df_origin.iloc[idx][0])[:-10])
-        if idx % 1000 == 0:
-            end_time = time.time()
-            print((end_time - begin_time))
-            begin_time = time.time()
-            print(idx)
         if cbg_go not in state_cbgs:
             continue
         for key in visit_home.keys():
@@ -47,16 +42,16 @@ def write_pop_flow(csv_read_path, csv_write_path):
     state_cbgs = get_state_cgbs()
     pop_flow = get_pop_flow(df_origin, state_cbgs)
     pop_flow.to_csv(csv_write_path)
-    print(csv_write_path)
+
 
 
 if __name__ == "__main__":
-    file_path = "G:/dataset/social-distance/02/"
-    save_path = "G:/dataset/popflow-state/"
-    for file in tqdm(os.listdir(file_path)):
+    file_path = "/root/data/liangyi/dataset/social-distance/04/"
+    save_path = "/root/data/liangyi/dataset/popflow-state/04/"
+    for file in os.listdir(file_path):
         print(file)
         if ".csv" in file:
             csv_read_path = file_path + file
             tmp = '-'.join(file.split('-')[:3])
-            csv_write_path = save_path + tmp + '-state-popflow-.csv'
+            csv_write_path = save_path + tmp + '-state-popflow.csv'
             write_pop_flow(csv_read_path,csv_write_path)
